@@ -47,8 +47,14 @@ function GG = CorrMaster(memtype,corrtype,cutoff,varargin)
 % Author: Ahmet Cecen
 % Contact: ahmetcecen@gmail.com
 % 
-% Updated: Sep. 30, 2016
-% By Yue Sun (ysun@u.northwestern.edu)
+% Update: Sep. 30, 2016
+% Added comments.
+% -- Yue Sun
+%
+% Update: Dec. 8, 2017
+% Changed the behavior of cutoff. Now cutoff = n will result in (2n+1) 
+% elements on each dimension.
+% -- Yue Sun
 
 switch memtype
 	
@@ -68,12 +74,12 @@ switch memtype
                 GG = H1;
 				
 				if ismatrix(H1)
-					GG = GG((floor((size(GG,1)/2)+1)-(cutoff-1)):(floor((size(GG,1)/2)+1)+(cutoff-1)),...
-								(floor((size(GG,2)/2)+1)-(cutoff-1)):(floor((size(GG,2)/2)+1)+(cutoff-1)));
+					GG = GG((floor((size(GG,1)/2)+1)-cutoff):(floor((size(GG,1)/2)+1)+cutoff),...
+								(floor((size(GG,2)/2)+1)-cutoff):(floor((size(GG,2)/2)+1)+cutoff));
 				elseif ndims(H1)==3
-					GG = GG((floor((size(GG,1)/2)+1)-(cutoff-1)):(floor((size(GG,1)/2)+1)+(cutoff-1)),...
-								(floor((size(GG,2)/2)+1)-(cutoff-1)):(floor((size(GG,2)/2)+1)+(cutoff-1)),...
-								(floor((size(GG,3)/2)+1)-(cutoff-1)):(floor((size(GG,3)/2)+1)+(cutoff-1)));
+					GG = GG((floor((size(GG,1)/2)+1)-cutoff):(floor((size(GG,1)/2)+1)+cutoff),...
+								(floor((size(GG,2)/2)+1)-cutoff):(floor((size(GG,2)/2)+1)+cutoff),...
+								(floor((size(GG,3)/2)+1)-cutoff):(floor((size(GG,3)/2)+1)+cutoff));
 				else
 					error('Incorrect Number of Dimensions!');
 				end
@@ -94,12 +100,12 @@ switch memtype
                 GG = H1;		
 							
 				if ismatrix(H1)
-					GG = GG((floor((size(GG,1)/2)+1)-(cutoff-1)):(floor((size(GG,1)/2)+1)+(cutoff-1)),...
-								(floor((size(GG,2)/2)+1)-(cutoff-1)):(floor((size(GG,2)/2)+1)+(cutoff-1)));
+					GG = GG((floor((size(GG,1)/2)+1)-cutoff):(floor((size(GG,1)/2)+1)+cutoff),...
+								(floor((size(GG,2)/2)+1)-cutoff):(floor((size(GG,2)/2)+1)+cutoff));
 				elseif ndims(H1)==3
-					GG = GG((floor((size(GG,1)/2)+1)-(cutoff-1)):(floor((size(GG,1)/2)+1)+(cutoff-1)),...
-								(floor((size(GG,2)/2)+1)-(cutoff-1)):(floor((size(GG,2)/2)+1)+(cutoff-1)),...
-								(floor((size(GG,3)/2)+1)-(cutoff-1)):(floor((size(GG,3)/2)+1)+(cutoff-1)));
+					GG = GG((floor((size(GG,1)/2)+1)-cutoff):(floor((size(GG,1)/2)+1)+cutoff),...
+								(floor((size(GG,2)/2)+1)-cutoff):(floor((size(GG,2)/2)+1)+cutoff),...
+								(floor((size(GG,3)/2)+1)-cutoff):(floor((size(GG,3)/2)+1)+cutoff));
 				else
 					error('Incorrect Number of Dimensions!');
 				end							
@@ -120,36 +126,36 @@ switch memtype
 		
         % If 3D
         if length(Hsize)==3
-			DataSize=Hsize-[2*(cutoff-1),2*(cutoff-1),2*(cutoff-1)];
+			DataSize=Hsize-[2*cutoff,2*cutoff,2*cutoff];
 			nz=DataSize(3);		
-			ztra=mod(nz,(winmulti*cutoff));		
-			zbc=floor(nz/(winmulti*cutoff));
+			ztra=mod(nz,(winmulti*(cutoff+1)));		
+			zbc=floor(nz/(winmulti*(cutoff+1)));
 			zbuf=floor(ztra/zbc);
-			zwinsize=(winmulti*cutoff)+zbuf;
+			zwinsize=(winmulti*(cutoff+1))+zbuf;
 			zbuftra=mod(ztra,zbuf);
 			zwinlist=[zwinsize*ones(zbc-1,1);(zwinsize+zbuftra)];
-			GG = zeros((1+2*(cutoff-1)),(1+2*(cutoff-1)),(1+2*(cutoff-1))); 
+			GG = zeros((1+2*cutoff),(1+2*cutoff),(1+2*cutoff)); 
         end
 
         if length(Hsize)==2
-            DataSize=Hsize-[2*(cutoff-1),2*(cutoff-1)];
-			GG = zeros((1+2*(cutoff-1)),(1+2*(cutoff-1))); 
+            DataSize=Hsize-[2*cutoff,2*cutoff];
+			GG = zeros((1+2*cutoff),(1+2*cutoff)); 
         end
 	
 		nx=DataSize(1);
 		ny=DataSize(2);
 
-		xtra=mod(nx,(winmulti*cutoff));
-		ytra=mod(ny,(winmulti*cutoff));
+		xtra=mod(nx,(winmulti*(cutoff+1)));
+		ytra=mod(ny,(winmulti*(cutoff+1)));
 
-		xbc=floor(nx/(winmulti*cutoff));
-		ybc=floor(ny/(winmulti*cutoff));
+		xbc=floor(nx/(winmulti*(cutoff+1)));
+		ybc=floor(ny/(winmulti*(cutoff+1)));
 
 		xbuf=floor(xtra/xbc);
 		ybuf=floor(ytra/ybc);
 
-		xwinsize=(winmulti*cutoff)+xbuf;
-		ywinsize=(winmulti*cutoff)+ybuf;
+		xwinsize=(winmulti*(cutoff+1))+xbuf;
+		ywinsize=(winmulti*(cutoff+1))+ybuf;
 
 		xbuftra=mod(xtra,xbuf);
 		ybuftra=mod(ytra,ybuf);
@@ -178,17 +184,17 @@ switch memtype
                             progress=progress+1;
 							
 							% Grab H1 Window
-							HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
-								((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)));
+							HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*cutoff),...
+								((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*cutoff));
 								
 							% Create H2 Mask
-							MM1 = padarray(ones(xwinlist(xx),ywinlist(yy)),[cutoff-1,cutoff-1],0,'both');        
+							MM1 = padarray(ones(xwinlist(xx),ywinlist(yy)),[cutoff,cutoff],0,'both');        
 							
 							% Compute Convolution
 							G = fftshift(ifftn(fftn(HH1).*conj(fftn(HH1.*MM1))));
 							
-							G = G((floor((size(G,1)/2)+1)-(cutoff-1)):(floor((size(G,1)/2)+1)+(cutoff-1)),...
-								(floor((size(G,2)/2)+1)-(cutoff-1)):(floor((size(G,2)/2)+1)+(cutoff-1)));
+							G = G((floor((size(G,1)/2)+1)-cutoff):(floor((size(G,1)/2)+1)+cutoff),...
+								(floor((size(G,2)/2)+1)-cutoff):(floor((size(G,2)/2)+1)+cutoff));
 						 
 							GG = GG + G;     
                             
@@ -221,19 +227,19 @@ switch memtype
                                 progress=progress+1;
 							
 								% Grab H1 Window
-								HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
-									((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)),...
-									((sum(zwinlist(1:zz)))-zwinlist(zz)+1):(sum(zwinlist(1:zz))+2*(cutoff-1)));
+								HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*cutoff),...
+									((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*cutoff),...
+									((sum(zwinlist(1:zz)))-zwinlist(zz)+1):(sum(zwinlist(1:zz))+2*cutoff));
 									
 								% Create H2 Mask
-								MM1 = padarray(ones(xwinlist(xx),ywinlist(yy),zwinlist(zz)),[cutoff-1,cutoff-1,cutoff-1],0,'both');        
+								MM1 = padarray(ones(xwinlist(xx),ywinlist(yy),zwinlist(zz)),[cutoff,cutoff,cutoff],0,'both');        
 								
 								% Compute Convolution
 								G = fftshift(ifftn(fftn(HH1).*conj(fftn(HH1.*MM1))));
 								
-								G = G((floor((size(G,1)/2)+1)-(cutoff-1)):(floor((size(G,1)/2)+1)+(cutoff-1)),...
-									(floor((size(G,2)/2)+1)-(cutoff-1)):(floor((size(G,2)/2)+1)+(cutoff-1)),...
-									(floor((size(G,3)/2)+1)-(cutoff-1)):(floor((size(G,3)/2)+1)+(cutoff-1)));
+								G = G((floor((size(G,1)/2)+1)-cutoff):(floor((size(G,1)/2)+1)+cutoff),...
+									(floor((size(G,2)/2)+1)-cutoff):(floor((size(G,2)/2)+1)+cutoff),...
+									(floor((size(G,3)/2)+1)-cutoff):(floor((size(G,3)/2)+1)+cutoff));
 							 
 								GG = GG + G;  
                                 
@@ -279,21 +285,21 @@ switch memtype
                             progress=progress+1;
 							
 							% Grab H1 Window
-							HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
-								((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)));
+							HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*cutoff),...
+								((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*cutoff));
 								
 							% Grab H2 Window
-							HH2 = n.(ArrayName2)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
-								((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)));
+							HH2 = n.(ArrayName2)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*cutoff),...
+								((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*cutoff));
 								
 							% Create H2 Mask
-							MM1 = padarray(ones(xwinlist(xx),ywinlist(yy)),[cutoff-1,cutoff-1],0,'both');
+							MM1 = padarray(ones(xwinlist(xx),ywinlist(yy)),[cutoff,cutoff],0,'both');
 
 							% Compute Convolution
 							G = fftshift(ifftn(fftn(HH1).*conj(fftn(HH2.*MM1))));
 							
-							G = G((floor((size(G,1)/2)+1)-(cutoff-1)):(floor((size(G,1)/2)+1)+(cutoff-1)),...
-								(floor((size(G,2)/2)+1)-(cutoff-1)):(floor((size(G,2)/2)+1)+(cutoff-1)));
+							G = G((floor((size(G,1)/2)+1)-cutoff):(floor((size(G,1)/2)+1)+cutoff),...
+								(floor((size(G,2)/2)+1)-cutoff):(floor((size(G,2)/2)+1)+cutoff));
 						 
 							GG = GG + G; 
                             
@@ -326,24 +332,24 @@ switch memtype
                                 progress=progress+1;
 							
 								% Grab H1 Window
-								HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
-									((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)),...
-									((sum(zwinlist(1:zz)))-zwinlist(zz)+1):(sum(zwinlist(1:zz))+2*(cutoff-1)));
+								HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*cutoff),...
+									((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*cutoff),...
+									((sum(zwinlist(1:zz)))-zwinlist(zz)+1):(sum(zwinlist(1:zz))+2*cutoff));
 									
 								% Grab H2 Window
-								HH2 = n.(ArrayName2)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
-									((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)),...
-									((sum(zwinlist(1:zz)))-zwinlist(zz)+1):(sum(zwinlist(1:zz))+2*(cutoff-1)));
+								HH2 = n.(ArrayName2)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*cutoff),...
+									((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*cutoff),...
+									((sum(zwinlist(1:zz)))-zwinlist(zz)+1):(sum(zwinlist(1:zz))+2*cutoff));
 									
 								% Create H2 Mask
-								MM1 = padarray(ones(xwinlist(xx),ywinlist(yy),zwinlist(zz)),[cutoff-1,cutoff-1,cutoff-1],0,'both');
+								MM1 = padarray(ones(xwinlist(xx),ywinlist(yy),zwinlist(zz)),[cutoff,cutoff,cutoff],0,'both');
 
 								% Compute Convolution
 								G = fftshift(ifftn(fftn(HH1).*conj(fftn(HH2.*MM1))));
 								
-								G = G((floor((size(G,1)/2)+1)-(cutoff-1)):(floor((size(G,1)/2)+1)+(cutoff-1)),...
-									(floor((size(G,2)/2)+1)-(cutoff-1)):(floor((size(G,2)/2)+1)+(cutoff-1)),...
-									(floor((size(G,3)/2)+1)-(cutoff-1)):(floor((size(G,3)/2)+1)+(cutoff-1)));
+								G = G((floor((size(G,1)/2)+1)-cutoff):(floor((size(G,1)/2)+1)+cutoff),...
+									(floor((size(G,2)/2)+1)-cutoff):(floor((size(G,2)/2)+1)+cutoff),...
+									(floor((size(G,3)/2)+1)-cutoff):(floor((size(G,3)/2)+1)+cutoff));
 							 
 								GG = GG + G;      
   
@@ -394,11 +400,3 @@ end
 
     
 end
-
-
-
-
-
-
-
-
