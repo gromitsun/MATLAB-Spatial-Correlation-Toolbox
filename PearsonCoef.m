@@ -17,6 +17,12 @@ function GG = PearsonCoef(corrtype,cutoff,periodicity,varargin)
 %
 % GG = TwoPoint('cross',cutoff,periodicity,H1,H2,M1,M2) will calculate the
 % crosscorrelation of H1 with mask M1 and H2 with mask M2.
+%
+%
+% Update: Dec. 8, 2017
+% Fixed mean calculations when masks are present. Only points where M1~=0 
+% (or M2~=0) are counted when calculating means.
+% -- Yue Sun
 
 
 memtype = 'full';
@@ -42,7 +48,7 @@ switch periodicity
                     % Periodic 2pt Auto Masked 
                     H1 = varargin{1};
                     M1 = varargin{2};
-                    H1 = H1 - mean(H1(:).*M1(:)); % Subtract mean
+                    H1 = H1 - mean(H1(M1~=0).*M1(M1~=0)); % Subtract mean (only points where M1~=0 are counted)
                     GG = CorrMaster(memtype,corrtype,cutoff,double(H1.*M1));
                     sigma1 = CorrMaster(memtype,'cross',cutoff,double(H1.^2.*M1),double(M1));
                     GG = GG./sqrt(sigma1.*sigma1(end:-1:1,end:-1:1,end:-1:1));
@@ -67,8 +73,8 @@ switch periodicity
                     H1 = varargin{1};
                     H2 = varargin{2};
                     M1 = varargin{3};
-                    H1 = H1 - mean(H1(:).*M1(:)); % Subtract mean
-                    H2 = H2 - mean(H2(:).*M1(:)); % Subtract mean
+                    H1 = H1 - mean(H1(M1~=0).*M1(M1~=0)); % Subtract mean (only points where M1~=0 are counted)
+                    H2 = H2 - mean(H2(M1~=0).*M1(M1~=0)); % Subtract mean (only points where M1~=0 are counted)
                     GG = CorrMaster(memtype,corrtype,cutoff,double(H1.*M1),double(H2.*M1));
                     sigma1 = CorrMaster(memtype,'cross',cutoff,double(H1.^2.*M1),double(M1));
                     sigma2 = CorrMaster(memtype,'cross',cutoff,double(M1),double(H2.^2.*M1));
@@ -81,8 +87,8 @@ switch periodicity
                     H2 = varargin{2};
                     M1 = varargin{3};
                     M2 = varargin{4};
-                    H1 = H1 - mean(H1(:).*M1(:)); % Subtract mean
-                    H2 = H2 - mean(H2(:).*M2(:)); % Subtract mean
+                    H1 = H1 - mean(H1(M1~=0).*M1(M1~=0)); % Subtract mean (only points where M1~=0 are counted)
+                    H2 = H2 - mean(H2(M2~=0).*M2(M2~=0)); % Subtract mean (only points where M2~=0 are counted)
                     GG = CorrMaster(memtype,corrtype,cutoff,double(H1.*M1),double(H2.*M2));
                     sigma1 = CorrMaster(memtype,'cross',cutoff,double(H1.^2.*M1),double(M1));
                     sigma2 = CorrMaster(memtype,'cross',cutoff,double(M2),double(H2.^2.*M2));
@@ -110,7 +116,7 @@ switch periodicity
                     
                 elseif nargin == 5
                     
-                    % Non-Periodic 2pt Cross Masked
+                    % Non-Periodic 2pt Auto Masked
                     H1 = varargin{1};
                     M1 = varargin{2};
                     H1 = H1 - mean(H1(:).*M1(:)); % Subtract mean
