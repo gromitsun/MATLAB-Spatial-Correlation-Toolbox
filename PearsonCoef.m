@@ -119,7 +119,7 @@ switch periodicity
                     % Non-Periodic 2pt Auto Masked
                     H1 = varargin{1};
                     M1 = varargin{2};
-                    H1 = H1 - mean(H1(:).*M1(:)); % Subtract mean
+                    H1 = H1 - mean(H1(M1~=0).*M1(M1~=0)); % Subtract mean (only points where M1~=0 are counted)
                     GG = CorrMaster(memtype,corrtype,cutoff,padarray(double(H1.*M1),repmat(cutoff,[1 ndims(H1)]),0,'post'));
                     sigma1 = CorrMaster(memtype,'cross',cutoff,...
                                         padarray(double(H1.^2.*M1),repmat(cutoff,[1 ndims(H1)]),0,'post'),...
