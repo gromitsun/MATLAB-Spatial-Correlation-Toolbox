@@ -35,9 +35,20 @@ function GG = CorrMaster(memtype,corrtype,cutoff,varargin)
 % memory, resulting in only twice the computational time for most practical 
 % cases.
 %
+% If 'patched' mode is used, "DataFile" and "DataFile2" are supposed to be
+% in the following format:
+% "/path/to/DataFile/DataFile.mat/ArrayName"
+% where "/path/to/DataFile/DataFile.mat" is the full path to the datafile
+% to be used in the calculation, and ArrayName is the name of the array
+% object to be used in that file. Otherwise, the whole string in "DataFile"
+% or "DataFile2" will be assumed as the path to the ".mat" file, and
+% ArrayName is defaulted to "H1".
+% 
 % Author: Ahmet Cecen
 % Contact: ahmetcecen@gmail.com
-%
+% 
+% Updated: Sep. 30, 2016
+% By Yue Sun (ysun@u.northwestern.edu)
 
 switch memtype
 	
@@ -101,9 +112,11 @@ switch memtype
 		% Window Indexing Variables
 		DataFile=varargin{1};
 		winmulti=varargin{2};
+        
+        [DataFile, ArrayName] = sep_filename(DataFile);
 		
         m=matfile(DataFile);
-		Hsize=size(m,'H1');
+		Hsize=size(m, ArrayName);
 		
         % If 3D
         if length(Hsize)==3
@@ -165,7 +178,7 @@ switch memtype
                             progress=progress+1;
 							
 							% Grab H1 Window
-							HH1 = m.H1(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
+							HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
 								((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)));
 								
 							% Create H2 Mask
@@ -208,7 +221,7 @@ switch memtype
                                 progress=progress+1;
 							
 								% Grab H1 Window
-								HH1 = m.H1(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
+								HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
 									((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)),...
 									((sum(zwinlist(1:zz)))-zwinlist(zz)+1):(sum(zwinlist(1:zz))+2*(cutoff-1)));
 									
@@ -250,6 +263,9 @@ switch memtype
 			case 'cross'
 				% Memory Map
 				DataFile2=varargin{3};
+                
+                [DataFile2, ArrayName2] = sep_filename(DataFile2);
+                
 				n=matfile(DataFile2);
 				
 				
@@ -263,11 +279,11 @@ switch memtype
                             progress=progress+1;
 							
 							% Grab H1 Window
-							HH1 = m.H1(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
+							HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
 								((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)));
 								
 							% Grab H2 Window
-							HH2 = n.H1(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
+							HH2 = n.(ArrayName2)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
 								((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)));
 								
 							% Create H2 Mask
@@ -310,12 +326,12 @@ switch memtype
                                 progress=progress+1;
 							
 								% Grab H1 Window
-								HH1 = m.H1(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
+								HH1 = m.(ArrayName)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
 									((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)),...
 									((sum(zwinlist(1:zz)))-zwinlist(zz)+1):(sum(zwinlist(1:zz))+2*(cutoff-1)));
 									
 								% Grab H2 Window
-								HH2 = n.H1(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
+								HH2 = n.(ArrayName2)(((sum(xwinlist(1:xx)))-xwinlist(xx)+1):(sum(xwinlist(1:xx))+2*(cutoff-1)),...
 									((sum(ywinlist(1:yy)))-ywinlist(yy)+1):(sum(ywinlist(1:yy))+2*(cutoff-1)),...
 									((sum(zwinlist(1:zz)))-zwinlist(zz)+1):(sum(zwinlist(1:zz))+2*(cutoff-1)));
 									
@@ -357,6 +373,27 @@ switch memtype
 		end
 end
 
+end
+
+%% internal function to seperate data array name from data file name
+function [filename, arrayname] = sep_filename(s)
+
+sep = strfind(s, '.mat');
+if isempty(sep)
+    filename = s;
+    arrayname = 'H1';
+    return;
+end
+
+filename = s(1:(sep(end)+4));
+if length(s) > sep(end)+4
+    arrayname = s(sep(end)+5:end);
+else
+    arrayname = 'H1';
+end
+
+    
+end
 
 
 
