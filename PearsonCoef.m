@@ -3,19 +3,19 @@ function GG = PearsonCoef(corrtype,cutoff,periodicity,varargin)
 % method using FFTs. Use it if you have small datasets or an abundance of
 % memory. 
 %
-% GG = TwoPoint('auto',cutoff,periodicity,H1) will calculate the
+% GG = PearsonCoef('auto',cutoff,periodicity,H1) will calculate the
 % autocorrelation of H1.
 %
-% GG = TwoPoint('auto',cutoff,periodicity,H1,M1) will calculate the
+% GG = PearsonCoef('auto',cutoff,periodicity,H1,M1) will calculate the
 % autocorrelation of H1 with a mask M1.
 %
-% GG = TwoPoint('cross',cutoff,periodicity,H1,H2) will calculate the
+% GG = PearsonCoef('cross',cutoff,periodicity,H1,H2) will calculate the
 % crosscorrelation of H1 with H2.
 %
-% GG = TwoPoint('cross',cutoff,periodicity,H1,H2,M1) will calculate the
+% GG = PearsonCoef('cross',cutoff,periodicity,H1,H2,M1) will calculate the
 % crosscorrelation of H1 with H2, with a uniform mask M1.
 %
-% GG = TwoPoint('cross',cutoff,periodicity,H1,H2,M1,M2) will calculate the
+% GG = PearsonCoef('cross',cutoff,periodicity,H1,H2,M1,M2) will calculate the
 % crosscorrelation of H1 with mask M1 and H2 with mask M2.
 %
 %
